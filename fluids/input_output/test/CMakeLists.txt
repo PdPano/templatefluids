@@ -1,0 +1,7 @@
+add_gmock_test(OptionsTest options_test.cpp)
+target_link_libraries(OptionsTest input_output)
+add_clangformat(OptionsTest)
+
+add_gmock_test(TokenizerTest tokenizer_test.cpp)
+target_link_libraries(TokenizerTest input_output)
+add_clangformat(TokenizerTest)
