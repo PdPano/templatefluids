@@ -11,7 +11,7 @@ ShockHandler::ShockHandler(Options& opt)
     , delta((gam - 1.) / 2)
     , angular_coeff(3.
           / (sqrt((16. * gam - delta) * (1 + 16 * delta)) / (4 * (1. + delta))
-                        + 15. * delta / (4 * (1. + delta)) - 1))
+                + 15. * delta / (4 * (1. + delta)) - 1))
     , cfl(opt.cfl())
 {
 }

@@ -36,7 +36,7 @@ TimeIntegratorTool::TimeIntegratorTool(
 }
 
 void TimeIntegratorTool::time_derivative(
-    CartesianVariation& var, const CartesianGrid& grid, double t)
+    CartesianVariation& var, const CartesianGrid& grid, double /*t*/)
 {
     int nPointsTotal = grid.nPointsTotal;
     conv->init(grid);
@@ -45,32 +45,35 @@ void TimeIntegratorTool::time_derivative(
 #endif
     for (int ind = 0; ind < nPointsTotal; ind++) { // NOLINT
         var.grid_variation[ind] = conv->convection_x(grid, ind)
-            + conv->convection_y(grid, ind) + diss->dissipation_x(grid, ind)
-            + diss->dissipation_y(grid, ind);
+            /*+ conv->convection_y(grid, ind)*/
+            + diss->dissipation_x(grid, ind)
+            /*+ diss->dissipation_y(grid, ind)*/;
     }
     for (auto& bp : grid.boundary()) { // NOLINT
         int ind = bp.ind;
-        if (bp.x_boundary) {
-            var.grid_variation[ind] = (boundary->convection_x(grid, bp, t)
-                + boundary->dissipation_x(grid, bp));
-        }
-        else {
-            var.grid_variation[ind] = conv->convection_x(grid, ind)
-                + diss->dissipation_x(grid, ind);
-        }
-        if (bp.y_boundary) {
-            var.grid_variation[ind] += (boundary->convection_y(grid, bp, t)
-                + boundary->dissipation_y(grid, bp));
-        }
-        else {
-            var.grid_variation[ind] += conv->convection_y(grid, ind)
-                + diss->dissipation_y(grid, ind);
-        }
+        var.grid_variation[ind] = {0, 0, 0, 0};
+        /* if (bp.x_boundary) {
+             var.grid_variation[ind] = (boundary->convection_x(grid, bp, t)
+                 + boundary->dissipation_x(grid, bp));
+         }
+         else {
+             var.grid_variation[ind] = (conv->convection_x(grid, ind)
+                 + diss->dissipation_x(grid, ind));
+         }
+         if (bp.y_boundary) {
+            var.grid_variation[ind] +=  (boundary->convection_y(grid, bp, t)
+                  + boundary->dissipation_y(grid, bp));
+
+         }
+         else {
+             var.grid_variation[ind] += (conv->convection_y(grid, ind)
+                  + diss->dissipation_y(grid, ind));
+         }*/
     }
 }
 
 void TimeIntegratorTool::time_derivative(
-    CartesianVariation& var, const KaragiozisGrid& grid, double t)
+    CartesianVariation& var, const KaragiozisGrid& grid, double /*t*/)
 {
 
     int nPointsTotal = grid.nPointsTotal;
@@ -79,39 +82,42 @@ void TimeIntegratorTool::time_derivative(
 #endif
     for (int ind = 0; ind < nPointsTotal; ind++) { // NOLINT
         var.grid_variation[ind] = conv->convection_x(grid, ind)
-            + conv->convection_y(grid, ind) + diss->dissipation_x(grid, ind)
-            + diss->dissipation_y(grid, ind);
+            /*+ conv->convection_y(grid, ind)*/
+            + diss->dissipation_x(grid, ind)
+            /*+ diss->dissipation_y(grid, ind)*/;
     }
     for (const auto& ind : grid.to_revisit()) {
         var.grid_variation[ind] = conv_irreg->convection_x(grid, ind)
-            + conv_irreg->convection_y(grid, ind)
+            /*+ conv_irreg->convection_y(grid, ind)*/
             + diss_irreg->dissipation_x(grid, ind)
-            + diss_irreg->dissipation_y(grid, ind);
+            /*+ diss_irreg->dissipation_y(grid, ind)*/;
     }
     for (auto& bp : grid.boundary()) { // NOLINT
         int ind = bp.ind;
-        if (bp.x_boundary) {
+        var.grid_variation[ind] = {0, 0, 0, 0};
+        /*if (bp.x_boundary) {
             var.grid_variation[ind] = (boundary_irreg->convection_x(grid, bp, t)
                 + boundary_irreg->dissipation_x(grid, bp));
         }
         else {
-            var.grid_variation[ind] = conv_irreg->convection_x(grid, ind)
-                + diss_irreg->dissipation_x(grid, ind);
+            var.grid_variation[ind] = (conv_irreg->convection_x(grid, ind)
+                + diss_irreg->dissipation_x(grid, ind));
         }
         if (bp.y_boundary) {
             var.grid_variation[ind]
                 += (boundary_irreg->convection_y(grid, bp, t)
-                    + boundary_irreg->dissipation_y(grid, bp));
+                     + boundary_irreg->dissipation_y(grid, bp));
         }
         else {
-            var.grid_variation[ind] += conv_irreg->convection_y(grid, ind)
-                + diss_irreg->dissipation_y(grid, ind);
-        }
+            var.grid_variation[ind]
+                += (conv_irreg->convection_y(grid, ind)
++ diss_irreg->dissipation_y(grid, ind));
+        }*/
     }
 }
 
 void TimeIntegratorTool::time_derivative(
-    CartesianVariation& var, const GhiasShockGrid& grid, double t)
+    CartesianVariation& var, const GhiasShockGrid& grid, double /*t*/)
 {
 
     int nPointsTotal = grid.nPointsTotal;
@@ -120,43 +126,49 @@ void TimeIntegratorTool::time_derivative(
 #endif
     for (int ind = 0; ind < nPointsTotal; ind++) { // NOLINT
         var.grid_variation[ind] = conv->convection_x(grid, ind)
-            + conv->convection_y(grid, ind) + diss->dissipation_x(grid, ind)
-            + diss->dissipation_y(grid, ind);
+            /*+ conv->convection_y(grid, ind)*/
+            + diss->dissipation_x(grid, ind)
+            /*+ diss->dissipation_y(grid, ind)*/;
     }
 
     auto& to_revisit = grid.to_revisit();
     for (auto& ind : to_revisit) {
         var.grid_variation[ind] = conv_irreg->convection_x(grid, ind)
-            + conv_irreg->convection_y(grid, ind)
+            /*+ conv_irreg->convection_y(grid, ind)*/
             + diss_irreg->dissipation_x(grid, ind)
-            + diss_irreg->dissipation_y(grid, ind);
+            /*+ diss_irreg->dissipation_y(grid, ind)*/;
     }
     for (auto& bp : grid.boundary()) { // NOLINT
         int ind = bp.ind;
+        var.grid_variation[ind] = {0., 0., 0., 0.};
+        /*
         if (bp.x_boundary) {
-            var.grid_variation[ind] = (boundary->convection_x(grid, bp, t)
+           var.grid_variation[ind] = (boundary->convection_x(grid, bp, t)
                 + boundary->dissipation_x(grid, bp));
         }
         else {
             var.grid_variation[ind] = conv_irreg->convection_x(grid, ind)
                 + diss_irreg->dissipation_x(grid, ind);
         }
+
         if (bp.y_boundary) {
-            var.grid_variation[ind] += (boundary->convection_y(grid, bp, t)
-                + boundary->dissipation_y(grid, bp));
+            var.grid_variation[ind]
+                +=  (boundary->convection_y(grid, bp, t)
++ boundary->dissipation_y(grid, bp));
         }
         else {
-            var.grid_variation[ind] += conv_irreg->convection_y(grid, ind)
-                + diss_irreg->dissipation_y(grid, ind);
-        }
+            var.grid_variation[ind]
+                += conv_irreg->convection_y(grid, ind)
++ diss_irreg->dissipation_y(grid, ind);
+        }*/
     }
 }
 
-void TimeIntegratorTool::fix_boundary(CartesianGrid* grid, double t)
+void TimeIntegratorTool::fix_boundary(CartesianGrid* /*grid*/, double /*t*/)
 {
-    for (auto& bp : grid->boundary()) {
+    /*for (auto& bp : grid->boundary()) {
         boundary->fix_boundary(grid, bp, t);
-    }
+    }*/
 }
 
 void TimeIntegratorTool::update_values(CartesianGrid* grid, double t)

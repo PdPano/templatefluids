@@ -192,9 +192,9 @@ void KaragiozisGrid::extrapolate_right(BodyDiscontinuity& bd, int shift_plus,
         new_rho = this->rho(shift_plus);
     }
     else {
-        std::cerr << "Should not be here. An entry was found in the "
-                     "discontinuity map at an invalid point!"
-                  << std::endl;
+        std::cerr << "[K] Should not be here. An entry was found in the "
+                     "discontinuity map at an invalid point! ind="
+                  << shift_plus << std::endl;
         new_rho = 1.0;
     }
     bd.right().set_rho(new_rho);

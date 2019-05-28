@@ -31,7 +31,10 @@ def createDiscontinuitiesList(curves,xgrid,ygrid,params):
     posY,derY=maskUtils.getYCrossings(curves,xgrid,ygrid)
     discontinuityList=[]
     dx=xgrid[1]-xgrid[0]
-    dy=ygrid[1]-ygrid[0]
+    try:
+        dy=ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
     xmin=xgrid.min()
     ymin=ygrid.min()
     xgrid_trick = np.array(list(xgrid)+[xgrid[-1]+dx])
@@ -67,7 +70,10 @@ def createDiscontinuitiesList(curves,xgrid,ygrid,params):
 def removeImagesOutsideDomain(imagePointsPair,gridMask,xgrid,ygrid):
     nPointsI,nPointsJ=gridMask.shape
     dx=xgrid[1]-xgrid[0]
-    dy=ygrid[1]-ygrid[0]
+    try:
+        dy=ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
     xmin=xgrid.min()
     ymin=ygrid.min()
     origKeys=imagePointsPair.keys()
@@ -113,7 +119,10 @@ def createBoundaryMask(boundarySpecs,xgrid,ygrid):
     nPointsI,nPointsJ = mask.shape
 
     dx = xgrid[1]-xgrid[0]
-    dy = ygrid[1]-ygrid[0]
+    try:
+        dy = ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
 
     xmin=xgrid[0]
     ymin=ygrid[0]
@@ -160,7 +169,10 @@ def maskBodiesFromCrossings(posX,derX,posY,derY,xgrid,ygrid,mask):
     nPointsI,nPointsJ = mask.shape
 
     dx = xgrid[1]-xgrid[0]
-    dy = ygrid[1]-ygrid[0]
+    try:
+        dy = ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
 
     xmin=xgrid[0]
     ymin=ygrid[0]

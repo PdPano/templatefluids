@@ -30,6 +30,7 @@ public:
     bool remove_disconnected_shocks();
     bool delete_shock_near_wall();
     void specific_print() override final;
+    void handle_shock_near_wall();
 
 private:
     std::vector<ShockDiscontinuity> shock_points_c;
@@ -72,6 +73,8 @@ private:
     bool find_wall_shock(DiscontinuityList& disc_list);
     bool create_x_shock(double dt, int ind, int ind_x);
     bool create_y_shock(double dt, int ind, int ind_y);
+    bool list_has_wall(DiscontinuityList& disc_list);
+    void compute_collisions(DiscontinuityMap* disc_map, int ind, int shift);
     const std::string base_path;
     int counter;
 };

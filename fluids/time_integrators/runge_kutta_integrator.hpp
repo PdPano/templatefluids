@@ -137,8 +137,10 @@ double RungeKuttaIntegrator<Grid, Variation>::get_dt(
     double dt = 1e10;
     max_mach_number = max_u_plus_c = max_v_plus_c = 0.0;
 #ifndef DEBUG
-#pragma omp parallel for reduction(                                            \
-    min : dt), reduction(max : max_mach_number, max_u_plus_c, max_v_plus_c)
+#pragma omp parallel for reduction(min                                         \
+                                   : dt),                                      \
+    reduction(max                                                              \
+              : max_mach_number, max_u_plus_c, max_v_plus_c)
 #endif
     for (int ind = 0; ind < grid_in.nPointsTotal; ind++) {
         auto point = grid.values(ind);
@@ -147,9 +149,9 @@ double RungeKuttaIntegrator<Grid, Variation>::get_dt(
         double v = fabs(pf.v(point));
         const double dx = grid.dx;
         const double dy = grid.dy;
-        double new_dt
-            = 1 / 2. * std::min({dx / (u + c), dy / (v + c),
-                           dx * dx * reynolds / 2., dy * dy * reynolds / 2.});
+        double new_dt = 1 / 2.
+            * std::min({dx / (u + c), dy / (v + c), dx * dx * reynolds / 2.,
+                  dy * dy * reynolds / 2.});
         if (new_dt < dt) {
             dt = new_dt;
         }

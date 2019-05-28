@@ -107,11 +107,13 @@ void ShockGrid::grid_specific_pre_update(double dt)
     bool crossed_point = update_crossed_grid_points(check_x_dir, check_y_dir);
     bool shocks_merged = merge_compatible_shocks();
     bool weak_shocks_removed = remove_weak_shocks();
-    bool shock_near_wall_deleted = delete_shock_near_wall();
+    /*bool shock_near_wall_deleted = delete_shock_near_wall();*/
+    handle_shock_near_wall();
+
     bool disconnected_shocks_removed = remove_disconnected_shocks();
 
     if (crossed_point or shocks_merged or weak_shocks_removed
-        or disconnected_shocks_removed or shock_near_wall_deleted) {
+        or disconnected_shocks_removed) {
         clear_discontinuity_map();
         ShockGrid::fill_discontinuity_map();
     }
@@ -453,7 +455,7 @@ void ShockGrid::compute_shock_theta_x(ShockDiscontinuity* sp)
     double mean_pos_x_up, mean_pos_y_up;
     double mean_pos_x_down, mean_pos_y_down;
     if (compatible_up.empty() and compatible_down.empty()) {
-        sp->is_connected = false;
+        /*sp->is_connected = false;*/
         return;
     }
     if (compatible_up.empty()) {
@@ -552,7 +554,7 @@ void ShockGrid::compute_shock_theta_y(ShockDiscontinuity* sp)
     double mean_pos_x_left, mean_pos_y_left;
     double mean_pos_x_right, mean_pos_y_right;
     if (compatible_left.empty() and compatible_right.empty()) {
-        sp->is_connected = false;
+        /*sp->is_connected = false;*/
         return;
     }
     if (compatible_left.empty()) {
@@ -713,8 +715,8 @@ void ShockGrid::extrapolate_points_right(ShockDiscontinuity& sp, int shift_plus,
     }
     else {
         std::cerr << "Should not be here. An entry was found in the "
-                     "discontinuity map at an invalid point!"
-                  << std::endl;
+                     "discontinuity map at an invalid point! ind="
+                  << shift_plus << std::endl;
     }
 }
 
@@ -774,4 +776,78 @@ void ShockGrid::specific_print()
         output << disc_X(&disc) << "," << disc_Y(&disc) << std::endl;
     }
     counter++;
+}
+
+void ShockGrid::handle_shock_near_wall()
+{
+    auto* disc_map = discontinuity_map_x();
+    for (auto& disc_x : (*disc_map)) {
+        if (list_has_wall(disc_x.second)) {
+            if (has_discont_x(disc_x.first, -1)) {
+                compute_collisions(
+                    disc_map, disc_x.first, indJMinusOne(disc_x.first));
+            }
+            if (disc_x.second.size() > 1) {
+                compute_collisions(disc_map, disc_x.first, 0);
+            }
+            if (has_discont_x(disc_x.first, 1)) {
+                compute_collisions(
+                    disc_map, disc_x.first, indJPlusOne(disc_x.first));
+            }
+        }
+    }
+}
+
+bool ShockGrid::list_has_wall(DiscontinuityList& disc_list)
+{
+    /*Very limited. Only useful in 1d */
+    bool has_wall = false;
+    for (auto& disc : disc_list) {
+        auto* wall = dynamic_cast<BodyDiscontinuity*>(disc);
+        if (wall != nullptr) {
+            has_wall = true;
+        }
+    }
+    return has_wall;
+}
+
+void ShockGrid::compute_collisions(
+    DiscontinuityMap* disc_map, int ind_wall, int ind_shock)
+{
+    /*Very limited. Only useful in 1d */
+    DiscontinuityList& list_wall = (*disc_map)[ind_wall];
+    DiscontinuityList& list_shock = (*disc_map)[ind_shock];
+
+    for (auto& disc_w : list_wall) {
+        auto* wall = dynamic_cast<BodyDiscontinuity*>(disc_w);
+        if (wall != nullptr) {
+            for (auto& disc_s : list_shock) {
+                auto* shock = dynamic_cast<ShockDiscontinuity*>(disc_s);
+                if (shock != nullptr) {
+                    auto x_shock = disc_X(shock);
+                    auto x_wall = disc_X(wall);
+                    auto delta = x_shock - x_wall;
+                    if (((delta > 0) and (delta < dx))
+                        and (cos(shock->theta) * shock->w < 0)) {
+                        sh.compute_wall_interaction(*shock, 0.0);
+                        if (shock->ind > wall->ind) {
+                            set_values(shock->left(), shock->ind);
+                        }
+                        wall->right() = shock->left();
+                        wall->T = pf.temperature(shock->left());
+                        std::cout << "T: " << wall->T << std::endl;
+                    }
+                    if (((-delta >= 0) and (-delta <= dx))
+                        and (cos(shock->theta) * shock->w > 0)) {
+                        sh.compute_wall_interaction(*shock, 0.0);
+                        if (shock->ind < wall->ind) {
+                            set_values(shock->right(), wall->ind);
+                        }
+                        wall->left() = shock->right();
+                        wall->T = pf.temperature(shock->right());
+                    }
+                }
+            }
+        }
+    }
 }

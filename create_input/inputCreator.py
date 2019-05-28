@@ -11,7 +11,7 @@ points = np.array([(1.202*np.cos(t)+4.8,
                     2.007512502*np.sin(t)-0.0) for t in pointsParams])
 points2 = np.array([(1.202*np.cos(t)+1.8,
                      1.007512502*np.sin(t)-2.0) for t in pointsParams])
-points = np.array([(0.502*np.cos(t)+3.0, 0.502*np.sin(t)+0.0)
+points = np.array([(0.552*np.cos(t)+10.0, 0.552*np.sin(t)+0.0)
                    for t in pointsParams])
 
 curvePoints = [points, points2]
@@ -22,15 +22,15 @@ pointsFromSplines = slib.getPointsFromSplines(curves, 10)
 
 outputFunctions.printSplinesToFile(pointsFromSplines)
 
-nx = 801
-ny = 401
+nx = 401
+ny = 1
 
 # xgrid = np.linspace(-4,4,nx)
 # ygrid = np.linspace(-2.5,2.5,ny)
 # xgrid = np.linspace(-1,1,nx)
 # ygrid = np.linspace(-1,1,ny)
 xmin, xmax = (0.0, 10.0)
-ymin, ymax = (-2.5, 2.5)
+ymin, ymax = (0, 1)
 xgrid = np.linspace(xmin, xmax, nx)
 ygrid = np.linspace(ymin, ymax, ny)
 
@@ -66,9 +66,16 @@ boundarySpecs = [[(xmin, ymin), (xmin, ymax), 'SubsonicInletLeft',
 #               [(xmax,ymax),(xmax,ymin),'AdiabaticNoSlipWallRight',{}],
 #               [(xmin,ymin),(xmax,ymin),'AdiabaticNoSlipWallBottom',{}]]
 
+boundarySpecs = [[(xmin, ymin), (xmin, ymax), 'SupersonicInletLeft',
+                 {'u': 5/4.,
+                  'rho': 8/3.,
+                  'T':3*np.sqrt(3)/4,
+                  'timeFunctionType': 'linearRamp',
+                  'timeParameterA': 0.0}],
+                 ]
 
 # params={'gamma':1.4,'mach':3.2,'T_inf':1.0,'init':'explosion','explosion_pos':(int(2*nx/3),int(3*ny/4))}
-params = {'gamma': 1.4, 'mach': 2.5, 'T_inf': 1.0}
+params = {'gamma': 1.4, 'mach': 1.0, 'T_inf': 1.0}
 mask, discontinuities, discontinuityPos = (
         createMask.createMaskAndDiscontinuities(curves, boundarySpecs,
                                                 xgrid, ygrid, params))

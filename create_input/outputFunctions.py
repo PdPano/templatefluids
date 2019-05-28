@@ -5,7 +5,10 @@ def printImmersedBoundary(imagePointsPair,gridMask,xgrid,ygrid,fname="./results/
     nPointsI,nPointsJ=gridMask.shape
     X,Y = np.meshgrid(xgrid,ygrid)
     dx = xgrid[1]-xgrid[0]
-    dy = ygrid[1]-ygrid[0]
+    try:
+        dy = ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
     xmin = xgrid.min()
     ymin = ygrid.min()
     with open(fname,"w") as fout:
@@ -68,7 +71,10 @@ def printFlagMap(flagMap,xgrid,ygrid,fname="./results/gridInfo.dat"):
     xmin = xgrid.min()
     ymin = ygrid.min()
     dx=xgrid[1]-xgrid[0]
-    dy=ygrid[1]-ygrid[0]
+    try:
+        dy=ygrid[1]-ygrid[0]
+    except:
+        dy=0.1
     ni,nj = flagMap.shape
     with open(fname,"w") as fout:
         fout.write("%d %d\n"%(ni,nj))

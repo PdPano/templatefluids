@@ -7,7 +7,10 @@ def processBoundarySpecs(boundarySpecs,gridMask,xgrid,ygrid,params={'gamma':1.4,
     nPointsI,nPointsJ = gridMask.shape
 
     dx = xgrid[1]-xgrid[0]
-    dy = ygrid[1]-ygrid[0]
+    try:
+        dy = ygrid[1]-ygrid[0]
+    except:
+        dy =10
 
     xmin=xgrid[0]
     ymin=ygrid[0]
